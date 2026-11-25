@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AssemblyName>mpws</AssemblyName>
+    <Version>1.1.3</Version>
     <Product>mypersonalwindowsscanner</Product>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
   </PropertyGroup>

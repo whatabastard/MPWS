@@ -47,4 +47,36 @@
   <Style x:Key="Island" TargetType="Border"><Setter Property="CornerRadius" Value="28"/><Setter Property="Padding" Value="6"/><Setter Property="Background" Value="{StaticResource Glass}"/><Setter Property="BorderBrush" Value="{StaticResource Lip}"/><Setter Property="BorderThickness" Value="1"/><Setter Property="Effect"><Setter.Value><DropShadowEffect Color="#000000" BlurRadius="18" ShadowDepth="6" Opacity=".8"/></Setter.Value></Setter></Style>
   <Style TargetType="TextBox"><Setter Property="Background" Value="#19191E"/><Setter Property="Foreground" Value="#F3EEE3"/><Setter Property="CaretBrush" Value="#B89342"/><Setter Property="Padding" Value="14,9"/><Setter Property="Template"><Setter.Value><ControlTemplate TargetType="TextBox"><Border CornerRadius="12" Background="{TemplateBinding Background}" BorderBrush="#75613A" BorderThickness="1"><ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}"/></Border></ControlTemplate></Setter.Value></Setter></Style>
   <Style TargetType="ScrollBar"><Setter Property="Width" Value="8"/><Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ScrollBar"><Track x:Name="PART_Track" IsDirectionReversed="True"><Track.Thumb><Thumb><Thumb.Template><ControlTemplate TargetType="Thumb"><Border Background="#61543C" CornerRadius="4"/></ControlTemplate></Thumb.Template></Thumb></Track.Thumb></Track></ControlTemplate></Setter.Value></Setter></Style>
+  <Style x:Key="TileGrid" TargetType="ItemsControl">
+    <Setter Property="ItemsPanel"><Setter.Value><ItemsPanelTemplate><UniformGrid Columns="3"/></ItemsPanelTemplate></Setter.Value></Setter>
+    <Setter Property="ItemTemplate"><Setter.Value>
+      <DataTemplate>
+        <Border x:Name="TileFrame" Style="{StaticResource Panel}" Margin="3,0,7,12" Padding="16">
+          <StackPanel>
+            <DockPanel>
+              <Path Data="{Binding Icon}" Width="25" Height="25" HorizontalAlignment="Left" Stretch="Uniform" Stroke="#B89342" StrokeThickness="1.5"/>
+              <Border HorizontalAlignment="Right" VerticalAlignment="Center" CornerRadius="8" Padding="7,3" Background="#363127">
+                <TextBlock Text="{Binding Badge}" Foreground="#D3BE92" FontSize="11"/>
+              </Border>
+            </DockPanel>
+            <TextBlock Text="{Binding Title}" FontSize="17" FontWeight="SemiBold" Margin="0,10,0,4"/>
+            <TextBlock Text="{Binding Detail}" Style="{StaticResource Muted}"/>
+          </StackPanel>
+        </Border>
+        <DataTemplate.Triggers><DataTrigger Binding="{Binding Highlight}" Value="True"><Setter TargetName="TileFrame" Property="BorderBrush" Value="#D4B46A"/><Setter TargetName="TileFrame" Property="BorderThickness" Value="2"/></DataTrigger></DataTemplate.Triggers>
+      </DataTemplate>
+    </Setter.Value></Setter>
+  </Style>
+  <DataTemplate x:Key="CategoryLabel">
+    <StackPanel Orientation="Horizontal">
+      <Path x:Name="Symbol" Width="16" Height="16" Stretch="Uniform" StrokeThickness="1.5" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" Data="M1,1 H8 V8 H1 Z M12,1 H19 V8 H12 Z M1,12 H8 V19 H1 Z M12,12 H19 V19 H12 Z"/>
+      <TextBlock Text="{Binding}" Margin="7,0,0,0"/>
+    </StackPanel>
+    <DataTemplate.Triggers>
+      <DataTrigger Binding="{Binding}" Value="CS2"><Setter TargetName="Symbol" Property="Data" Value="M10,3 A7,7 0 1 1 9.99,3 M10,0 V6 M10,14 V20 M0,10 H6 M14,10 H20"/></DataTrigger>
+      <DataTrigger Binding="{Binding}" Value="Dota 2"><Setter TargetName="Symbol" Property="Data" Value="M1,1 H19 V19 H1 Z M2,2 L18,18 M2,7 L13,18 M10,2 L18,10"/></DataTrigger>
+      <DataTrigger Binding="{Binding}" Value="Discord"><Setter TargetName="Symbol" Property="Data" Value="M1,2 H19 V14 H8 L3,18 V14 H1 Z M5,8 H7 M10,8 H12 M15,8 H16"/></DataTrigger>
+      <DataTrigger Binding="{Binding}" Value="Steam"><Setter TargetName="Symbol" Property="Data" Value="M2,13 L8,16 16,7 M14,2 A4,4 0 1 1 13.99,2 M6,13 A3,3 0 1 1 5.99,13"/></DataTrigger>
+    </DataTemplate.Triggers>
+  </DataTemplate>
 </ResourceDictionary>

@@ -40,3 +40,12 @@ Get-FileHash .\mpws.exe -Algorithm SHA256
 ## Лицензия
 
 [MIT](LICENSE)
+
+
+## Версия 1.1.3
+
+Сканер показывает фоновые задания, правила приоритета IFEO, профиль TCP Internet и питание USB. Поиск понимает симптомы и коды ошибок, например «щёлкает звук» или «0x116». В блоке Baseline текущие параметры восстановления GPU сопоставлены с [документированными значениями Microsoft](https://learn.microsoft.com/en-us/windows-hardware/drivers/display/tdr-registry-keys).
+
+![Области диагностики](docs/scanner.png)
+
+![Поиск по коду ошибки](docs/symptom-search.png)

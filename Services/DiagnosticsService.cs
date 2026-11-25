@@ -157,6 +157,40 @@ public static class DiagnosticsService
             list.Add(new("GlobalTimerResolutionRequests",Info,Value(@"SYSTEM\CurrentControlSet\Control\Session Manager\kernel","GlobalTimerResolutionRequests")??"Не задано","Исключён из предупреждений по настройке MPWS."));
             return Task.CompletedTask;
         });
+        await Group("Планировщик задач", async () =>
+        {
+            var json = await PS("$tasks=@(Get-ScheduledTask); @{total=$tasks.Count;running=@($tasks | Where-Object State -eq Running).Count;disabled=@($tasks | Where-Object State -eq Disabled).Count} | ConvertTo-Json -Compress");
+            using var doc = JsonDocument.Parse(json);
+            var tasks = doc.RootElement;
+            list.Add(new("Планировщик задач", Info, $"Доступно: {tasks.GetProperty("total")} · выполняется: {tasks.GetProperty("running")} · отключено: {tasks.GetProperty("disabled")}",
+                "Снимок на момент проверки. Сверьте время рывка с журналом задач; количество фоновых заданий само по себе не указывает на сбой."));
+        });
+        await Group("Реестр и приоритеты", () =>
+        {
+            foreach(var exe in new[]{"cs2.exe","dota2.exe","Discord.exe","steam.exe","javaw.exe"})
+            {
+                var value=Value(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\"+exe+@"\PerfOptions","CpuPriorityClass");
+                list.Add(new("Приоритет · "+exe, value=="4"?Risk:value==null?Ok:Info, value??"Нет переопределения",
+                    "Постоянное правило запуска IFEO. 3 означает высокий приоритет, 4 — реального времени. Такие правила могут задерживать ввод и звук при нагрузке."));
+            }
+            return Task.CompletedTask;
+        });
+        await Group("Сетевой стек", async () =>
+        {
+            var json=await PS("Get-NetTCPSetting -SettingName Internet | Select-Object @{n='auto';e={$_.AutoTuningLevelLocal.ToString()}},@{n='ecn';e={$_.EcnCapability.ToString()}} | ConvertTo-Json -Compress");
+            using var doc=JsonDocument.Parse(json);
+            list.Add(new("TCP · профиль Internet",Info,$"AutoTuning (локально): {doc.RootElement.GetProperty("auto")} · ECN: {doc.RootElement.GetProperty("ecn")}",
+                "AutoTuning управляет окном приёма TCP. ECN сигнализирует о перегрузке сети. Эти значения относятся к TCP-профилю, а игровой трафик может идти по UDP."));
+        });
+        await Group("Питание устройств", async () =>
+        {
+            var output=await Run("powercfg.exe","/qh","SCHEME_CURRENT","2a737441-1930-4402-8d77-b2bebba308a3","48e6b7a6-50f5-4782-a5d4-53bb8f07e226");
+            var values=Regex.Matches(output,@"0x([0-9a-fA-F]{8})\s*$",RegexOptions.Multiline);
+            if(values.Count<2) throw new IOException("Схема не вернула параметры USB.");
+            string Mode(Match m)=>Convert.ToUInt32(m.Groups[1].Value,16) switch {0=>"выкл.",1=>"вкл.",var n=>n.ToString()};
+            list.Add(new("USB · выборочная приостановка",Info,$"От сети: {Mode(values[^2])} · от батареи: {Mode(values[^1])}",
+                "Схема может приостанавливать отдельные устройства USB при простое. При пропадании мыши или звука проверьте, повторяется ли симптом именно после простоя."));
+        });
         return list;
     }
 }
